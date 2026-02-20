@@ -12,8 +12,9 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <!-- jsPDF for PDF generation -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-    <!-- Google Maps JavaScript API -->
-    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyB41DRUbKWJHPxaFjMAwdrzWzbVKartNGg&callback=initMap" async defer></script>
+    <!-- Leaflet CSS and JS (replacing Google Maps) -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <style>
         * {
             margin: 0;
@@ -794,7 +795,7 @@
             cursor: pointer;
             width: 100%;
         }
-        /* Google Maps Section */
+        /* Leaflet Map Section (renamed from Google Maps) */
         .map-section {
             background: var(--bg-secondary);
             margin: 1.5rem 1rem;
@@ -811,6 +812,7 @@
             width: 100%;
             border-radius: 16px;
             margin-bottom: 1.5rem;
+            z-index: 1;
         }
         .location-info {
             display: grid;
@@ -1404,7 +1406,7 @@
             </button>
         </div>
     </div>
-    <!-- Google Maps -->
+    <!-- Leaflet Map (replaced Google Maps) -->
     <div class="map-section">
         <h2><i class="fas fa-map-marked-alt"></i> Find Us</h2>
         <div id="map"></div>
@@ -1826,20 +1828,19 @@
         function pauseSlideshow() { isPaused = true; }
         function resumeSlideshow() { isPaused = false; }
         
-        // Google Maps
-        window.initMap = function() {
-            const location = { lat: -29.315, lng: 27.486 };
-            map = new google.maps.Map(document.getElementById('map'), {
-                center: location,
-                zoom: 14,
-                styles: [{ featureType: 'poi', stylers: [{ visibility: 'off' }] }]
-            });
-            new google.maps.Marker({
-                position: location,
-                map: map,
-                title: 'Nau Nau Carpentry'
-            });
-        };
+        // Leaflet Map (replacing Google Maps)
+        function initMap() {
+            const location = [-29.315, 27.486]; // [lat, lng] for Leaflet
+            map = L.map('map').setView(location, 14);
+            
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+            }).addTo(map);
+            
+            L.marker(location).addTo(map)
+                .bindPopup('Nau Nau Carpentry')
+                .openPopup();
+        }
         
         // Logo triple tap
         window.handleLogoClick = function() {
@@ -2307,6 +2308,7 @@
             loadData();
             renderProducts();
             initSlideshow();
+            initMap(); // Initialize Leaflet map
             
             const slideshow = document.getElementById('heroSlideshow');
             if (slideshow) {
