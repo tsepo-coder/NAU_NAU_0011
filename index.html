@@ -1,0 +1,2344 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
+    <title>Nau Nau Carpentry · master woodworkers</title>
+    <!-- Google Fonts & Icons -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet">
+    <!-- Font Awesome 6 (free) -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <!-- jsPDF for PDF generation -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <!-- Google Maps JavaScript API -->
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyB41DRUbKWJHPxaFjMAwdrzWzbVKartNGg&callback=initMap" async defer></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        :root {
+            --bg-primary: #faf7f2;
+            --bg-secondary: #ffffff;
+            --text-primary: #2d3e50;
+            --text-secondary: #5d4037;
+            --accent-brown: #8B5A2B;
+            --accent-light: #c39a6b;
+            --accent-warm: #e6b17e;
+            --whatsapp-green: #25D366;
+            --whatsapp-hover: #20b859;
+            --shadow-color: rgba(93, 64, 55, 0.1);
+            --card-bg: #ffffff;
+            --border-color: #e8d9cc;
+            --footer-bg: #2c3e50;
+            --footer-text: #ecf0f1;
+            --wood-light: rgba(139, 90, 43, 0.03);
+            --special-color: #e67e22;
+            --special-glow: rgba(230, 126, 34, 0.3);
+            --map-bg: #f0e9e2;
+            --danger-color: #d44e2c;
+            --success-color: #27ae60;
+            --info-color: #3498db;
+            --warning-color: #f39c12;
+        }
+        /* DARK MODE */
+        body.dark-mode {
+            --bg-primary: #1e2b36;
+            --bg-secondary: #2c3e50;
+            --text-primary: #ecf0f1;
+            --text-secondary: #d4a373;
+            --accent-brown: #b4865f;
+            --accent-light: #8B4513;
+            --shadow-color: rgba(0,0,0,0.3);
+            --card-bg: #34495e;
+            --border-color: #5d6d7e;
+            --footer-bg: #1a2632;
+            --footer-text: #bdc3c7;
+            --wood-light: rgba(180, 134, 95, 0.05);
+            --special-color: #f39c12;
+            --map-bg: #2c3e50;
+        }
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.5;
+            transition: background 0.3s, color 0.3s;
+            -webkit-tap-highlight-color: transparent;
+        }
+        /* Wood texture background */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-image: repeating-linear-gradient(45deg, var(--wood-light) 0px, var(--wood-light) 2px, transparent 2px, transparent 4px);
+            pointer-events: none;
+            z-index: -1;
+        }
+        /* Top bar with CALL US button */
+        .top-bar {
+            background: var(--footer-bg);
+            color: #fff;
+            padding: 0.8rem 1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.85rem;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+        .contact-info {
+            display: flex;
+            gap: 1.5rem;
+            flex-wrap: wrap;
+        }
+        .contact-info span {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .contact-info i {
+            color: var(--accent-warm);
+        }
+        /* Call Us Button */
+        .call-us-btn {
+            background: var(--accent-warm);
+            color: var(--footer-bg);
+            padding: 0.5rem 1.5rem;
+            border-radius: 40px;
+            text-decoration: none;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.95rem;
+            transition: all 0.2s;
+            border: 2px solid white;
+        }
+        .call-us-btn:hover {
+            background: var(--accent-light);
+            transform: scale(1.02);
+        }
+        .call-us-btn i {
+            font-size: 1rem;
+        }
+        /* Dark mode toggle */
+        .dark-mode-toggle {
+            background: var(--accent-brown);
+            color: white;
+            border: none;
+            padding: 0.5rem 1.2rem;
+            border-radius: 40px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: background 0.2s;
+        }
+        .dark-mode-toggle:hover {
+            background: var(--accent-light);
+        }
+        /* Main header */
+        .main-header {
+            background: var(--bg-secondary);
+            padding: 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 1rem;
+            box-shadow: 0 4px 15px var(--shadow-color);
+            border-bottom: 3px solid var(--accent-brown);
+            transition: background 0.3s;
+        }
+        .logo-area {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+        .logo-area:active {
+            transform: scale(0.98);
+        }
+        .logo-img {
+            width: 65px;
+            height: 65px;
+            border-radius: 12px;
+            object-fit: cover;
+            border: 3px solid var(--accent-brown);
+            box-shadow: 0 4px 8px rgba(139, 90, 43, 0.2);
+        }
+        .brand-name h1 {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--accent-brown);
+            line-height: 1.2;
+        }
+        .brand-name p {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            letter-spacing: 1px;
+        }
+        .search-bar {
+            flex: 1;
+            max-width: 400px;
+            display: flex;
+            margin: 0 0.5rem;
+        }
+        .search-bar input {
+            width: 100%;
+            padding: 0.8rem 1rem;
+            border: 2px solid var(--border-color);
+            border-radius: 40px 0 0 40px;
+            font-size: 0.95rem;
+            outline: none;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+        }
+        .search-bar input:focus {
+            border-color: var(--accent-brown);
+        }
+        .search-bar button {
+            background: var(--accent-brown);
+            border: none;
+            padding: 0 1.2rem;
+            border-radius: 0 40px 40px 0;
+            color: white;
+            cursor: pointer;
+            font-size: 1rem;
+        }
+        /* WhatsApp contact button */
+        .whatsapp-contact {
+            background: var(--whatsapp-green);
+            color: white;
+            padding: 0.8rem 1.5rem;
+            border-radius: 40px;
+            text-decoration: none;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            font-size: 0.95rem;
+            transition: all 0.2s;
+            box-shadow: 0 4px 12px rgba(37, 211, 102, 0.3);
+        }
+        .whatsapp-contact:hover {
+            background: var(--whatsapp-hover);
+            transform: scale(1.02);
+        }
+        /* Category navigation */
+        .category-nav {
+            background: var(--bg-secondary);
+            border-bottom: 1px solid var(--border-color);
+            padding: 0.8rem 0.5rem;
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+            transition: background 0.3s;
+        }
+        .category-nav a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            padding: 0.4rem 0.8rem;
+            border-radius: 40px;
+            transition: all 0.2s;
+        }
+        .category-nav a:hover,
+        .category-nav a.active {
+            background: var(--accent-brown);
+            color: white;
+        }
+        /* Hero banner with slideshow */
+        .hero-section {
+            margin: 1rem;
+            border-radius: 24px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px var(--shadow-color);
+            background: linear-gradient(135deg, #e6d5b8 0%, #d4b595 100%);
+            position: relative;
+        }
+        .hero-slideshow {
+            position: relative;
+            width: 100%;
+            min-height: 400px;
+            overflow: hidden;
+        }
+        .hero-slide {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.5s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 1.5rem;
+        }
+        .hero-slide.active {
+            opacity: 1;
+            visibility: visible;
+        }
+        .slide-content {
+            display: flex;
+            align-items: center;
+            gap: 2rem;
+            max-width: 1000px;
+            width: 100%;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        .slide-image {
+            flex: 1;
+            min-width: 200px;
+            max-width: 300px;
+        }
+        .slide-image img {
+            width: 100%;
+            height: auto;
+            border-radius: 24px;
+            box-shadow: 0 15px 30px rgba(0,0,0,0.2);
+            border: 4px solid white;
+        }
+        .slide-text {
+            flex: 1;
+            min-width: 250px;
+            text-align: center;
+        }
+        .slide-text h2 {
+            font-size: 2rem;
+            color: #5d4037;
+            margin-bottom: 0.5rem;
+        }
+        .slide-text p {
+            font-size: 1rem;
+            color: #5d4037;
+            opacity: 0.9;
+        }
+        .slide-price {
+            font-size: 2.2rem;
+            font-weight: 800;
+            color: var(--accent-brown);
+            margin: 0.5rem 0;
+        }
+        .special-badge-slide {
+            display: inline-block;
+            background: var(--special-color);
+            color: white;
+            padding: 0.8rem 2rem;
+            border-radius: 60px;
+            font-weight: 700;
+            font-size: 1.1rem;
+            margin-top: 1rem;
+            animation: breathe 2s ease-in-out infinite;
+        }
+        @keyframes breathe {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+        .slide-controls {
+            position: absolute;
+            bottom: 15px;
+            left: 0;
+            right: 0;
+            display: flex;
+            justify-content: center;
+            gap: 0.8rem;
+            z-index: 10;
+        }
+        .slide-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: rgba(93, 64, 55, 0.5);
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        .slide-dot.active {
+            background: var(--accent-brown);
+        }
+        .slide-nav-btn {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.3);
+            backdrop-filter: blur(5px);
+            border: none;
+            color: var(--accent-brown);
+            font-size: 1.2rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 10;
+        }
+        .slide-nav-btn.prev {
+            left: 10px;
+        }
+        .slide-nav-btn.next {
+            right: 10px;
+        }
+        /* Payment Info Banner */
+        .payment-info-banner {
+            background: linear-gradient(135deg, var(--accent-brown), var(--accent-warm));
+            color: white;
+            padding: 1.2rem;
+            margin: 1rem;
+            border-radius: 16px;
+            text-align: center;
+            font-size: 1.1rem;
+            font-weight: 500;
+            box-shadow: 0 4px 15px rgba(139, 90, 43, 0.3);
+        }
+        .payment-info-banner i {
+            margin-right: 0.5rem;
+            font-size: 1.3rem;
+        }
+        /* Products section */
+        .products-section {
+            padding: 1rem;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+        .section-header h2 {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--text-secondary);
+            border-left: 6px solid var(--accent-brown);
+            padding-left: 1rem;
+        }
+        .view-all {
+            color: var(--accent-brown);
+            text-decoration: none;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 0.3rem;
+            padding: 0.5rem 1rem;
+            border-radius: 40px;
+            background: var(--bg-primary);
+        }
+        .view-all:hover {
+            background: var(--accent-warm);
+            color: white;
+        }
+        .products-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 1.5rem;
+        }
+        .product-card {
+            background: var(--card-bg);
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 8px 20px var(--shadow-color);
+            transition: box-shadow 0.2s;
+            border: 1px solid var(--border-color);
+            position: relative;
+        }
+        .product-card:hover {
+            box-shadow: 0 15px 30px rgba(139, 90, 43, 0.15);
+        }
+        .wood-badge {
+            position: absolute;
+            top: 0.8rem;
+            left: 0.8rem;
+            background: var(--accent-brown);
+            color: white;
+            padding: 0.3rem 1rem;
+            border-radius: 40px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            z-index: 2;
+        }
+        /* Special tag with breathing animation */
+        .special-tag {
+            position: absolute;
+            top: 0.8rem;
+            right: 0.8rem;
+            background: var(--special-color);
+            color: white;
+            padding: 0.3rem 1rem;
+            border-radius: 40px;
+            font-size: 0.7rem;
+            font-weight: 700;
+            z-index: 2;
+            animation: breathe 2s ease-in-out infinite;
+        }
+        .product-image {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+            border-bottom: 2px solid var(--accent-warm);
+        }
+        .product-details {
+            padding: 1.2rem;
+        }
+        .product-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 0.3rem;
+        }
+        .product-price {
+            font-size: 1.6rem;
+            font-weight: 700;
+            color: var(--accent-brown);
+            margin-bottom: 1rem;
+        }
+        .product-actions {
+            display: flex;
+            gap: 0.8rem;
+        }
+        .inquire-btn {
+            flex: 1;
+            background: #25D366;
+            color: white;
+            border: none;
+            padding: 0.9rem;
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 0.95rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+        .like-btn {
+            background: var(--border-color);
+            border: none;
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            color: var(--accent-brown);
+            cursor: pointer;
+        }
+        .like-btn.liked {
+            background: #fee2d4;
+            color: #d44e2c;
+        }
+        /* Product Admin Controls */
+        .product-admin-controls {
+            display: flex;
+            gap: 0.5rem;
+            margin: 0.5rem 1rem 1rem;
+        }
+        .admin-control-btn {
+            flex: 1;
+            background: var(--bg-primary);
+            border: 1px solid var(--border-color);
+            padding: 0.6rem;
+            border-radius: 8px;
+            font-size: 0.8rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.3rem;
+            color: var(--text-primary);
+        }
+        .admin-control-btn.special {
+            background: var(--special-color);
+            color: white;
+            border: none;
+        }
+        .admin-control-btn.delete {
+            background: var(--danger-color);
+            color: white;
+            border: none;
+        }
+        .admin-control-btn.edit {
+            background: var(--accent-brown);
+            color: white;
+            border: none;
+        }
+        /* Payment button */
+        .payment-mini-btn {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 65px;
+            height: 65px;
+            background: linear-gradient(135deg, #FFD700, #FFA500);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: 0 4px 20px rgba(255, 215, 0, 0.4);
+            z-index: 99;
+            border: 3px solid white;
+            transition: transform 0.2s;
+        }
+        .payment-mini-btn:hover {
+            transform: scale(1.05);
+        }
+        .payment-mini-btn i {
+            color: white;
+            font-size: 2rem;
+        }
+        /* Payment panel */
+        .payment-panel {
+            position: fixed;
+            bottom: 95px;
+            right: 20px;
+            width: 300px;
+            background: var(--bg-secondary);
+            border-radius: 24px;
+            box-shadow: 0 15px 40px rgba(0,0,0,0.3);
+            padding: 1.2rem;
+            transform: scale(0);
+            opacity: 0;
+            transform-origin: bottom right;
+            transition: transform 0.2s, opacity 0.2s;
+            z-index: 100;
+            border: 3px solid #FFD700;
+        }
+        .payment-panel.show {
+            transform: scale(1);
+            opacity: 1;
+        }
+        .payment-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid #FFD700;
+        }
+        .payment-header h3 {
+            font-size: 1.2rem;
+            color: var(--text-secondary);
+        }
+        .close-payment {
+            background: none;
+            border: none;
+            font-size: 1.2rem;
+            cursor: pointer;
+            color: var(--text-primary);
+        }
+        .payment-buttons {
+            display: flex;
+            gap: 0.8rem;
+            margin-bottom: 1rem;
+        }
+        .payment-btn {
+            flex: 1;
+            padding: 0.9rem;
+            border-radius: 40px;
+            border: none;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            font-size: 0.95rem;
+        }
+        .payment-btn.mpesa {
+            background: #4CAF50;
+            color: white;
+        }
+        .payment-btn.ecocash {
+            background: #F9A825;
+            color: white;
+        }
+        .payment-details {
+            background: var(--bg-primary);
+            border-radius: 16px;
+            padding: 1rem;
+            margin-top: 0.5rem;
+            display: none;
+            border: 2px dashed #FFD700;
+        }
+        .payment-details.show {
+            display: block;
+        }
+        .payment-number {
+            background: var(--bg-secondary);
+            padding: 0.8rem;
+            border-radius: 8px;
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--accent-brown);
+            text-align: center;
+            margin: 0.5rem 0;
+            border: 1px solid var(--accent-brown);
+            word-break: break-all;
+        }
+        .copy-btn {
+            background: var(--accent-brown);
+            color: white;
+            border: none;
+            padding: 0.7rem;
+            border-radius: 40px;
+            font-size: 0.9rem;
+            cursor: pointer;
+            width: 100%;
+        }
+        /* Image Upload Section */
+        .image-upload-section {
+            background: var(--bg-secondary);
+            margin: 1.5rem 1rem;
+            padding: 1.5rem;
+            border-radius: 20px;
+            border: 2px dashed var(--accent-brown);
+        }
+        .upload-area {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 1rem;
+        }
+        .upload-btn {
+            background: var(--accent-brown);
+            color: white;
+            padding: 1rem 2rem;
+            border-radius: 40px;
+            cursor: pointer;
+            border: none;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .upload-btn.whatsapp {
+            background: var(--whatsapp-green);
+        }
+        #imagePreview {
+            max-width: 200px;
+            max-height: 200px;
+            border-radius: 12px;
+            margin: 0.5rem 0;
+            display: none;
+        }
+        /* Contact Section */
+        .contact-section {
+            background: var(--bg-secondary);
+            margin: 1.5rem 1rem;
+            padding: 1.5rem;
+            border-radius: 24px;
+        }
+        .selected-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.8rem;
+            margin-bottom: 1rem;
+            min-height: 40px;
+        }
+        .product-tag {
+            background: var(--bg-primary);
+            border-radius: 40px;
+            padding: 0.5rem 1rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.9rem;
+            border: 1px solid var(--accent-light);
+        }
+        textarea {
+            width: 100%;
+            padding: 1rem;
+            font-size: 0.95rem;
+            border: 2px solid var(--border-color);
+            border-radius: 16px;
+            resize: vertical;
+            outline: none;
+            margin-bottom: 1rem;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+        }
+        .send-btn {
+            background: var(--whatsapp-green);
+            border: none;
+            padding: 1rem;
+            border-radius: 60px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.8rem;
+            cursor: pointer;
+            width: 100%;
+        }
+        /* Google Maps Section */
+        .map-section {
+            background: var(--bg-secondary);
+            margin: 1.5rem 1rem;
+            padding: 1.5rem;
+            border-radius: 24px;
+        }
+        .map-section h2 {
+            font-size: 1.6rem;
+            color: var(--text-secondary);
+            margin-bottom: 1.2rem;
+        }
+        #map {
+            height: 300px;
+            width: 100%;
+            border-radius: 16px;
+            margin-bottom: 1.5rem;
+        }
+        .location-info {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+        .location-card {
+            background: var(--bg-primary);
+            padding: 1rem;
+            border-radius: 16px;
+            text-align: center;
+        }
+        .location-card i {
+            font-size: 1.8rem;
+            color: var(--accent-brown);
+            margin-bottom: 0.5rem;
+        }
+        .location-card h3 {
+            font-size: 1.1rem;
+            color: var(--text-secondary);
+            margin-bottom: 0.3rem;
+        }
+        .location-card p {
+            font-size: 0.9rem;
+        }
+        .directions-btn {
+            background: var(--accent-brown);
+            color: white;
+            border: none;
+            padding: 1rem 2rem;
+            border-radius: 60px;
+            font-weight: 600;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.8rem;
+            text-decoration: none;
+        }
+        /* Floating bar for liked items */
+        .floating-bar {
+            position: fixed;
+            bottom: 95px;
+            left: 20px;
+            background: var(--bg-secondary);
+            border-radius: 60px;
+            box-shadow: 0 10px 25px var(--shadow-color);
+            padding: 0.8rem 1.2rem;
+            display: none;
+            align-items: center;
+            gap: 1rem;
+            z-index: 98;
+            border: 2px solid var(--accent-brown);
+        }
+        .floating-bar.show {
+            display: flex;
+        }
+        .floating-info {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-weight: 600;
+        }
+        .floating-count {
+            background: var(--accent-brown);
+            color: white;
+            border-radius: 30px;
+            padding: 0.2rem 0.8rem;
+        }
+        .floating-btn {
+            background: var(--accent-brown);
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 40px;
+            font-size: 0.9rem;
+            cursor: pointer;
+        }
+        /* NEW: Toast Notification */
+        .toast-notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: var(--success-color);
+            color: white;
+            padding: 1rem 1.5rem;
+            border-radius: 12px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.2);
+            z-index: 2000;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            transform: translateX(400px);
+            transition: transform 0.3s ease;
+            max-width: 350px;
+        }
+        .toast-notification.show {
+            transform: translateX(0);
+        }
+        .toast-notification i {
+            font-size: 1.5rem;
+        }
+        .toast-notification.success {
+            background: var(--success-color);
+        }
+        .toast-notification.error {
+            background: var(--danger-color);
+        }
+        .toast-notification.info {
+            background: var(--info-color);
+        }
+        .toast-notification.warning {
+            background: var(--warning-color);
+        }
+        /* Admin Modal */
+        .admin-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.7);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+        .admin-modal.show {
+            display: flex;
+        }
+        .admin-panel {
+            background: var(--bg-secondary);
+            border-radius: 24px;
+            padding: 1.5rem;
+            max-width: 600px;
+            width: 90%;
+            max-height: 85vh;
+            overflow-y: auto;
+            border: 3px solid var(--accent-brown);
+            position: relative;
+        }
+        .password-section {
+            text-align: center;
+            padding: 1rem;
+        }
+        .password-input {
+            width: 100%;
+            padding: 1rem;
+            border: 2px solid var(--border-color);
+            border-radius: 12px;
+            margin: 1rem 0;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+        }
+        .login-btn {
+            background: var(--accent-brown);
+            color: white;
+            border: none;
+            padding: 1rem;
+            border-radius: 40px;
+            width: 100%;
+            font-weight: 600;
+        }
+        .admin-header {
+            margin-bottom: 1.5rem;
+        }
+        .admin-header h2 {
+            color: var(--text-secondary);
+            font-weight: 700;
+            font-size: 1.8rem;
+            margin-bottom: 0.5rem;
+        }
+        /* Dashboard Navigation Buttons */
+        .dashboard-nav {
+            display: flex;
+            gap: 1rem;
+            margin: 1.5rem 0;
+            flex-wrap: wrap;
+        }
+        .dashboard-nav-btn {
+            flex: 1;
+            min-width: 120px;
+            background: var(--accent-brown);
+            color: white;
+            border: none;
+            padding: 1rem;
+            border-radius: 12px;
+            font-weight: 700;
+            font-size: 1rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            transition: all 0.2s;
+            box-shadow: 0 4px 10px rgba(139, 90, 43, 0.3);
+        }
+        .dashboard-nav-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(139, 90, 43, 0.4);
+        }
+        .dashboard-nav-btn.active {
+            background: var(--special-color);
+        }
+        .dashboard-section {
+            display: none;
+            margin-bottom: 2rem;
+        }
+        .dashboard-section.active {
+            display: block;
+        }
+        .dashboard-section h3 {
+            color: var(--text-secondary);
+            font-weight: 700;
+            font-size: 1.3rem;
+            margin-bottom: 1rem;
+            border-left: 4px solid var(--accent-brown);
+            padding-left: 0.8rem;
+        }
+        /* Logout button at bottom */
+        .logout-container {
+            margin-top: 2rem;
+            padding-top: 1rem;
+            border-top: 2px solid var(--border-color);
+            text-align: center;
+        }
+        .logout-btn {
+            background: var(--danger-color);
+            color: white;
+            border: none;
+            padding: 1rem 2rem;
+            border-radius: 40px;
+            font-weight: 700;
+            font-size: 1.1rem;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.8rem;
+            transition: all 0.2s;
+        }
+        .logout-btn:hover {
+            background: #b33e22;
+            transform: scale(1.02);
+        }
+        .form-group {
+            margin-bottom: 1rem;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 0.3rem;
+            font-weight: 700;
+            color: var(--text-secondary);
+        }
+        .form-group input, .form-group select, .form-group textarea {
+            width: 100%;
+            padding: 0.8rem;
+            border: 2px solid var(--border-color);
+            border-radius: 12px;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+        }
+        /* Wax Seal Receipt Design */
+        .receipt-preview {
+            background: white;
+            border-radius: 20px;
+            padding: 1.5rem;
+            margin: 1.5rem 0;
+            border: 2px solid var(--accent-brown);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            position: relative;
+            overflow: hidden;
+        }
+        .receipt-header {
+            display: flex;
+            align-items: center;
+            gap: 1.2rem;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px dashed var(--accent-brown);
+        }
+        .receipt-logo {
+            width: 70px;
+            height: 70px;
+            border-radius: 12px;
+            object-fit: cover;
+            border: 3px solid var(--accent-brown);
+        }
+        .receipt-title h2 {
+            color: var(--accent-brown);
+            font-size: 1.6rem;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+        }
+        .receipt-title p {
+            color: var(--text-secondary);
+            font-size: 0.85rem;
+        }
+        .receipt-body {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+        .receipt-info {
+            background: var(--bg-primary);
+            padding: 1.2rem;
+            border-radius: 16px;
+        }
+        .receipt-info p {
+            margin: 0.6rem 0;
+            display: flex;
+            justify-content: space-between;
+            border-bottom: 1px dotted var(--border-color);
+            padding-bottom: 0.3rem;
+        }
+        .receipt-info strong {
+            color: var(--accent-brown);
+        }
+        /* Wax Seal Design */
+        .wax-seal {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background: #8B0000;
+            background: radial-gradient(circle at 30% 30%, #d44e2c, #8B0000);
+            border-radius: 50%;
+            width: 140px;
+            height: 140px;
+            margin: 0 auto;
+            position: relative;
+            box-shadow: 0 10px 20px rgba(139, 0, 0, 0.3);
+            border: 3px solid #d4a373;
+            padding: 0.5rem;
+        }
+        .seal-top {
+            color: #FFD700;
+            font-size: 0.7rem;
+            font-weight: 700;
+            letter-spacing: 1px;
+            text-align: center;
+            text-transform: uppercase;
+            margin-top: 0.5rem;
+        }
+        .seal-center {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.3rem;
+            margin: 0.3rem 0;
+        }
+        .seal-center i {
+            color: #FFD700;
+            font-size: 1.8rem;
+            filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));
+        }
+        .seal-paid {
+            color: white;
+            font-size: 1.4rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+            margin: 0.2rem 0;
+        }
+        .seal-bottom {
+            color: #FFD700;
+            font-size: 0.6rem;
+            font-weight: 600;
+            text-align: center;
+        }
+        .receipt-footer {
+            text-align: center;
+            margin-top: 1rem;
+            padding-top: 1rem;
+            border-top: 2px dashed var(--accent-brown);
+            color: var(--text-secondary);
+            font-size: 0.85rem;
+            font-style: italic;
+        }
+        .pdf-buttons {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1.5rem;
+        }
+        .pdf-btn {
+            flex: 1;
+            background: var(--accent-brown);
+            color: white;
+            border: none;
+            padding: 1rem;
+            border-radius: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            transition: all 0.2s;
+        }
+        .pdf-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(139, 90, 43, 0.3);
+        }
+        .pdf-btn.whatsapp {
+            background: var(--whatsapp-green);
+        }
+        .close-modal {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            position: absolute;
+            top: 0.8rem;
+            right: 0.8rem;
+            cursor: pointer;
+            color: var(--text-primary);
+        }
+        /* Admin Product List */
+        #adminProductList {
+            max-height: 300px;
+            overflow-y: auto;
+            margin-top: 1rem;
+        }
+        /* Footer */
+        footer {
+            background: var(--footer-bg);
+            color: #fff;
+            padding: 2rem 1rem 1rem;
+            margin-top: 2rem;
+        }
+        .footer-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+        }
+        .footer-column h4 {
+            color: var(--accent-warm);
+            margin-bottom: 1rem;
+            font-size: 1.1rem;
+        }
+        .footer-column p, .footer-column a {
+            color: var(--footer-text);
+            margin-bottom: 0.5rem;
+            display: block;
+            text-decoration: none;
+        }
+        .footer-column i {
+            width: 20px;
+            color: var(--accent-warm);
+            margin-right: 0.5rem;
+        }
+        .copyright {
+            text-align: center;
+            padding-top: 1.5rem;
+            margin-top: 1.5rem;
+            border-top: 1px solid rgba(255,255,255,0.1);
+            font-size: 0.85rem;
+        }
+        /* Mobile optimizations */
+        @media (max-width: 768px) {
+            .hero-slideshow { min-height: 350px; }
+            .slide-text h2 { font-size: 1.6rem; }
+            .slide-price { font-size: 1.8rem; }
+            .products-grid { grid-template-columns: 1fr 1fr; }
+            .payment-panel { width: 280px; }
+            .receipt-body { grid-template-columns: 1fr; }
+            .wax-seal { width: 120px; height: 120px; }
+            .toast-notification { width: 90%; right: 5%; }
+        }
+        @media (max-width: 480px) {
+            .products-grid { grid-template-columns: 1fr; }
+            .hero-slideshow { min-height: 400px; }
+            .slide-content { flex-direction: column; }
+            .slide-image { max-width: 200px; }
+            .dashboard-nav { flex-direction: column; }
+        }
+    </style>
+</head>
+<body>
+    <!-- Toast Notification -->
+    <div id="toast" class="toast-notification">
+        <i id="toastIcon" class="fas fa-check-circle"></i>
+        <span id="toastMessage"></span>
+    </div>
+
+    <!-- Top bar with CALL US button -->
+    <div class="top-bar">
+        <div class="contact-info">
+            <span><i class="fas fa-phone-alt"></i> +266 5655 1932</span>
+            <span><i class="fas fa-envelope"></i> woodwork@naunau.co.ls</span>
+        </div>
+        <div style="display: flex; gap: 1rem; align-items: center;">
+            <!-- Call Us Button -->
+            <a href="tel:+26656551932" class="call-us-btn">
+                <i class="fas fa-phone-alt"></i> Call Us
+            </a>
+            <button class="dark-mode-toggle" onclick="toggleDarkMode()">
+                <i class="fas fa-moon"></i> Dark
+            </button>
+        </div>
+    </div>
+    <!-- Main header -->
+    <div class="main-header">
+        <div class="logo-area" onclick="handleLogoClick()">
+            <img src="logo.png" alt="Nau Nau Carpentry" class="logo-img" onerror="this.src='data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' width=\'65\' height=\'65\' viewBox=\'0 0 100 100\'%3E%3Crect width=\'100\' height=\'100\' fill=\'%238B5A2B\'/%3E%3Ctext x=\'50\' y=\'70\' font-size=\'60\' text-anchor=\'middle\' fill=\'white\'%3E🪚%3C/text%3E%3C/svg%3E'">
+            <div class="brand-name">
+                <h1>Nau Nau</h1>
+                <p>CARPENTRY</p>
+            </div>
+        </div>
+       
+        <div class="search-bar">
+            <input type="text" id="searchInput" placeholder="Search furniture..." onkeyup="searchProducts()">
+            <button onclick="searchProducts()"><i class="fas fa-search"></i></button>
+        </div>
+       
+        <a href="#" class="whatsapp-contact" onclick="openWhatsApp()">
+            <i class="fab fa-whatsapp"></i> Chat
+        </a>
+    </div>
+    <!-- Category navigation -->
+    <div class="category-nav">
+        <a href="#" onclick="filterCategory('all'); return false;" class="active" id="cat-all">ALL</a>
+        <a href="#" onclick="filterCategory('bedroom'); return false;" id="cat-bedroom">BEDROOM</a>
+        <a href="#" onclick="filterCategory('lounge'); return false;" id="cat-lounge">LOUNGE</a>
+        <a href="#" onclick="filterCategory('dining'); return false;" id="cat-dining">DINING</a>
+        <a href="#" onclick="filterCategory('kitchen'); return false;" id="cat-kitchen">KITCHEN</a>
+        <a href="#" onclick="filterCategory('office'); return false;" id="cat-office">OFFICE</a>
+        <a href="#" onclick="filterCategory('custom'); return false;" id="cat-custom">CUSTOM</a>
+    </div>
+    
+    <!-- Payment info banner -->
+    <div class="payment-info-banner">
+        <i class="fas fa-money-bill-wave"></i>
+        Pay 50% to place your order - we'll buy materials and start crafting!
+    </div>
+    <!-- Products grid -->
+    <div class="products-section">
+        <div class="section-header">
+            <h2>OUR COLLECTION</h2>
+            <a href="#" class="view-all" onclick="filterCategory('all'); return false;">VIEW ALL <i class="fas fa-arrow-right"></i></a>
+        </div>
+        <div class="products-grid" id="productsGrid"></div>
+    </div>
+    <!-- Image upload for WhatsApp -->
+    <div class="image-upload-section">
+        <h3><i class="fas fa-camera"></i> Share a photo of what you want</h3>
+        <div class="upload-area">
+            <button class="upload-btn" onclick="document.getElementById('imageUpload').click()">
+                <i class="fas fa-cloud-upload-alt"></i> Choose Photo
+            </button>
+            <input type="file" id="imageUpload" accept="image/*" style="display:none;" onchange="previewImage(this)">
+            <img id="imagePreview" alt="Preview">
+            <button class="upload-btn whatsapp" onclick="sendImageToWhatsApp()">
+                <i class="fab fa-whatsapp"></i> Send Photo
+            </button>
+        </div>
+    </div>
+    <!-- Payment button -->
+    <div class="payment-mini-btn" id="paymentMiniBtn" onclick="togglePaymentPanel()">
+        <i class="fas fa-coins"></i>
+    </div>
+    <!-- Payment panel -->
+    <div class="payment-panel" id="paymentPanel">
+        <div class="payment-header">
+            <h3><i class="fas fa-coins"></i> Payment</h3>
+            <button class="close-payment" onclick="togglePaymentPanel()">✕</button>
+        </div>
+       
+        <div class="payment-buttons">
+            <button class="payment-btn mpesa" onclick="showPayment('mpesa')">
+                <i class="fas fa-mobile-alt"></i> Mpesa
+            </button>
+            <button class="payment-btn ecocash" onclick="showPayment('ecocash')">
+                <i class="fas fa-mobile-alt"></i> Ecocash
+            </button>
+        </div>
+        <div class="payment-details" id="mpesaDetails">
+            <div class="payment-number">+266 5655 1932</div>
+            <button class="copy-btn" onclick="copyNumber('+26656551932')">
+                <i class="far fa-copy"></i> Copy
+            </button>
+        </div>
+       
+        <div class="payment-details" id="ecocashDetails">
+            <div class="payment-number">6212 0274</div>
+            <button class="copy-btn" onclick="copyNumber('62120274')">
+                <i class="far fa-copy"></i> Copy
+            </button>
+        </div>
+    </div>
+    <!-- Google Maps -->
+    <div class="map-section">
+        <h2><i class="fas fa-map-marked-alt"></i> Find Us</h2>
+        <div id="map"></div>
+        <div class="location-info">
+            <div class="location-card">
+                <i class="fas fa-map-pin"></i>
+                <h3>Address</h3>
+                <p>123 Furniture Rd<br>Maseru</p>
+            </div>
+            <div class="location-card">
+                <i class="fas fa-clock"></i>
+                <h3>Hours</h3>
+                <p>Mon-Sat: 8am-5pm</p>
+            </div>
+            <div class="location-card">
+                <i class="fas fa-phone"></i>
+                <h3>Call</h3>
+                <p>+266 5655 1932</p>
+            </div>
+        </div>
+        <div style="text-align: center;">
+            <a href="https://www.google.com/maps/dir/?api=1&destination=Maseru,Lesotho" target="_blank" class="directions-btn">
+                <i class="fas fa-directions"></i> Directions
+            </a>
+        </div>
+    </div>
+    <!-- About section -->
+    <div class="map-section">
+        <h2><i class="fas fa-info-circle"></i> About Us</h2>
+        <p style="margin-bottom: 1rem;">Nau Nau Carpentry has been crafting quality wooden furniture in Lesotho since 2010. Every piece is handmade with care using sustainable local timber.</p>
+        <p>We believe in furniture that lasts generations - built with traditional techniques and modern design.</p>
+    </div>
+    <!-- Contact section -->
+    <div class="contact-section">
+        <h2><i class="fas fa-comment-dots"></i> Message Us</h2>
+       
+        <div class="selected-tags" id="selectedTags"></div>
+       
+        <textarea id="message" placeholder="Tell us what you need..." rows="3"></textarea>
+       
+        <button class="send-btn" onclick="sendToWhatsApp()">
+            <i class="fab fa-whatsapp"></i> Send via WhatsApp
+        </button>
+    </div>
+    <!-- Floating bar -->
+    <div class="floating-bar" id="floatingBar">
+        <div class="floating-info">
+            <i class="fas fa-heart"></i>
+            <span class="floating-count" id="likedCount">0</span>
+        </div>
+        <button class="floating-btn" onclick="addLikedToMessage()">
+            <i class="fas fa-plus"></i> Add
+        </button>
+    </div>
+    <!-- Admin Modal -->
+    <div class="admin-modal" id="adminModal">
+        <div class="admin-panel">
+            <button class="close-modal" onclick="closeAdminModal()">✕</button>
+           
+            <div class="password-section" id="passwordSection">
+                <h2><i class="fas fa-lock"></i> Admin Access</h2>
+                <input type="password" class="password-input" id="adminPassword" placeholder="Enter password">
+                <button class="login-btn" onclick="verifyPassword()">Login</button>
+            </div>
+           
+            <div class="admin-content" id="adminContent">
+                <div class="admin-header">
+                    <h2><i class="fas fa-tools"></i> Dashboard</h2>
+                </div>
+               
+                <!-- Dashboard Navigation Buttons -->
+                <div class="dashboard-nav">
+                    <button class="dashboard-nav-btn active" onclick="showDashboardSection('add')">
+                        <i class="fas fa-plus-circle"></i> Add Product
+                    </button>
+                    <button class="dashboard-nav-btn" onclick="showDashboardSection('receipt')">
+                        <i class="fas fa-receipt"></i> Create Receipt
+                    </button>
+                    <button class="dashboard-nav-btn" onclick="showDashboardSection('manage')">
+                        <i class="fas fa-list"></i> Manage Products
+                    </button>
+                </div>
+               
+                <!-- Add Product Section -->
+                <div id="dashboard-add" class="dashboard-section active">
+                    <h3><i class="fas fa-plus-circle"></i> Add New Product</h3>
+                    <div class="form-group">
+                        <label>Name</label>
+                        <input type="text" id="newName">
+                    </div>
+                    <div class="form-group">
+                        <label>Price (M)</label>
+                        <input type="number" id="newPrice">
+                    </div>
+                    <div class="form-group">
+                        <label>Description</label>
+                        <textarea id="newDesc" rows="2"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label>Category</label>
+                        <select id="newCategory">
+                            <option value="bedroom">Bedroom</option>
+                            <option value="lounge">Lounge</option>
+                            <option value="dining">Dining</option>
+                            <option value="kitchen">Kitchen</option>
+                            <option value="office">Office</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Photo</label>
+                        <input type="file" id="newImage" accept="image/*">
+                    </div>
+                    <div id="imagePreview" style="text-align:center;"></div>
+                    <button onclick="addNewProduct()" class="pdf-btn" style="width:100%;">+ Add Product</button>
+                </div>
+                <!-- Create Receipt Section -->
+                <div id="dashboard-receipt" class="dashboard-section">
+                    <h3><i class="fas fa-receipt"></i> Create Receipt</h3>
+                    <div class="form-group">
+                        <label>Customer</label>
+                        <input type="text" id="customerName">
+                    </div>
+                    <div class="form-group">
+                        <label>Product</label>
+                        <select id="productSelect"></select>
+                    </div>
+                    <div class="form-group">
+                        <label>Amount</label>
+                        <input type="number" id="amountPaid">
+                    </div>
+                    <div class="form-group">
+                        <label>Payment</label>
+                        <select id="paymentMethod">
+                            <option value="Mpesa">Mpesa</option>
+                            <option value="Ecocash">Ecocash</option>
+                            <option value="Cash">Cash</option>
+                        </select>
+                    </div>
+                   
+                    <!-- MODERN WAX SEAL RECEIPT -->
+                    <div class="receipt-preview" id="receiptPreview">
+                        <div class="receipt-header">
+                            <img src="logo.png" class="receipt-logo" id="receiptLogoImg" onerror="this.style.display='none'">
+                            <div class="receipt-title">
+                                <h2>Nau Nau</h2>
+                                <p>Carpentry · Master Woodworkers</p>
+                            </div>
+                        </div>
+                       
+                        <div class="receipt-body">
+                            <div class="receipt-info">
+                                <p><strong>Date:</strong> <span id="receiptDate"></span></p>
+                                <p><strong>Time:</strong> <span id="receiptTime"></span></p>
+                                <p><strong>Customer:</strong> <span id="receiptCustomer">-</span></p>
+                                <p><strong>Product:</strong> <span id="receiptProduct">-</span></p>
+                                <p><strong>Amount:</strong> <span id="receiptAmount">-</span></p>
+                                <p><strong>Payment:</strong> <span id="receiptPayment">-</span></p>
+                            </div>
+                           
+                            <!-- Wax Seal Design -->
+                            <div class="wax-seal">
+                                <div class="seal-top">NAU NAU CARPENTRY</div>
+                                <div class="seal-center">
+                                    <i class="fas fa-hammer"></i>
+                                    <i class="fas fa-circle"></i>
+                                    <i class="fas fa-wrench"></i>
+                                </div>
+                                <div class="seal-paid">PAID</div>
+                                <div class="seal-bottom">EST. 2010</div>
+                            </div>
+                        </div>
+                       
+                        <div class="receipt-footer">
+                            <i class="fas fa-tree"></i> Thank you for choosing Nau Nau · Built to last <i class="fas fa-tree"></i>
+                        </div>
+                    </div>
+                   
+                    <div class="pdf-buttons">
+                        <button class="pdf-btn" onclick="downloadAndSendPDF()">
+                            <i class="fas fa-download"></i> Download PDF
+                        </button>
+                    </div>
+                </div>
+                <!-- Manage Products Section -->
+                <div id="dashboard-manage" class="dashboard-section">
+                    <h3><i class="fas fa-list"></i> Manage Products</h3>
+                    <div id="adminProductList"></div>
+                </div>
+               
+                <!-- Logout button at bottom -->
+                <div class="logout-container">
+                    <button class="logout-btn" onclick="logoutAdmin()">
+                        <i class="fas fa-sign-out-alt"></i> Logout
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Footer -->
+    <footer>
+        <div class="footer-content">
+            <div class="footer-column">
+                <h4>Nau Nau Carpentry</h4>
+                <p><i class="fas fa-map-pin"></i> Maseru, Lesotho</p>
+                <p><i class="fas fa-phone"></i> +266 5655 1932</p>
+                <p><i class="fas fa-envelope"></i> woodwork@naunau.co.ls</p>
+            </div>
+            <div class="footer-column">
+                <h4>Quick Links</h4>
+                <a href="#" onclick="filterCategory('all'); return false;">Home</a>
+                <a href="#" onclick="document.querySelector('.map-section').scrollIntoView({behavior:'smooth'}); return false;">Location</a>
+                <a href="#" onclick="document.querySelector('.contact-section').scrollIntoView({behavior:'smooth'}); return false;">Contact</a>
+            </div>
+        </div>
+        <div class="copyright">
+            <p>© 2026 Nau Nau Carpentry · Built to last</p>
+        </div>
+    </footer>
+    <script>
+        // ===== GLOBAL VARIABLES =====
+        let likedProducts = [];
+        let addedProducts = [];
+        let allProducts = [];
+        let currentSlide = 0;
+        let slideInterval;
+        let isPaused = false;
+        let map;
+        // Triple tap counter
+        let tapCount = 0;
+        let tapTimer;
+        
+        // Toast notification function
+        function showToast(message, type = 'success') {
+            const toast = document.getElementById('toast');
+            const toastIcon = document.getElementById('toastIcon');
+            const toastMessage = document.getElementById('toastMessage');
+            
+            toast.className = 'toast-notification ' + type;
+            toastIcon.className = type === 'success' ? 'fas fa-check-circle' : 
+                                 type === 'error' ? 'fas fa-exclamation-circle' :
+                                 type === 'warning' ? 'fas fa-exclamation-triangle' : 'fas fa-info-circle';
+            toastMessage.textContent = message;
+            
+            toast.classList.add('show');
+            
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 3000);
+        }
+
+        // Load data from localStorage
+        function loadData() {
+            try {
+                const saved = localStorage.getItem('nauNauLiked');
+                if (saved) likedProducts = JSON.parse(saved);
+                
+                const savedProducts = localStorage.getItem('addedNauProducts');
+                if (savedProducts) addedProducts = JSON.parse(savedProducts);
+                
+                const savedAllProducts = localStorage.getItem('allNauProducts');
+                if (savedAllProducts) {
+                    allProducts = JSON.parse(savedAllProducts);
+                } else {
+                    initProducts();
+                }
+            } catch (e) {
+                console.error('Error loading data:', e);
+                initProducts();
+            }
+        }
+        
+        function saveAllProducts() {
+            localStorage.setItem('allNauProducts', JSON.stringify(allProducts));
+        }
+        
+        function saveAddedProducts() {
+            localStorage.setItem('addedNauProducts', JSON.stringify(addedProducts));
+        }
+        
+        // Initialize products
+        function initProducts() {
+            allProducts = [
+                { id: '1', name: 'Solid Wood Wardrobe', price: '2300', category: 'bedroom', image: 'product1.jpeg', special: false },
+                { id: '2', name: 'Creative Study Table', price: '1500', category: 'office', image: 'product2.jpeg', special: false },
+                { id: '3', name: 'White Kitchen Base', price: '2500', category: 'kitchen', image: 'product3.jpeg', special: false },
+                { id: '4', name: 'Oak Dining Table', price: '4500', category: 'dining', image: 'product4.jpeg', special: false },
+                { id: '5', name: 'Luxury Lounge Suite', price: '6500', category: 'lounge', image: 'product5.jpeg', special: false },
+                { id: '6', name: 'Custom Design', price: '1500+', category: 'custom', image: 'product6.jpeg', special: false }
+            ];
+            saveAllProducts();
+        }
+        
+        // Render products
+        function renderProducts() {
+            const grid = document.getElementById('productsGrid');
+            if (!grid) return;
+            grid.innerHTML = '';
+           
+            const allDisplayProducts = [...allProducts, ...addedProducts];
+           
+            allDisplayProducts.forEach(product => {
+                const card = createProductCard(product);
+                grid.appendChild(card);
+            });
+           
+            updateLikedUI();
+            updateProductSelect();
+        }
+        
+        function createProductCard(product) {
+            const card = document.createElement('div');
+            card.className = 'product-card';
+            card.dataset.productId = product.id;
+            card.dataset.category = product.category;
+            card.dataset.productName = product.name;
+            card.dataset.productPrice = `M${product.price}`;
+            card.dataset.productImage = product.image;
+           
+            const isSpecial = product.special || false;
+           
+            card.innerHTML = `
+                <div class="wood-badge">${product.category}</div>
+                ${isSpecial ? '<div class="special-tag"><i class="fas fa-star"></i> SPECIAL</div>' : ''}
+                <img src="${product.image}" alt="${product.name}" class="product-image" onerror="this.src='data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' width=\'200\' height=\'200\' viewBox=\'0 0 24 24\' fill=\'%238B5A2B\'%3E%3Cpath d=\'M20 5H4V19L20 5zm-2 4-6 6-2-2-4 4V7h12v2z\'/%3E%3C/svg%3E'">
+                <div class="product-details">
+                    <div class="product-title">${product.name}</div>
+                    <div class="product-price">M${product.price}</div>
+                    <div class="product-actions">
+                        <button class="inquire-btn" onclick="inquireProduct('${product.name}', 'M${product.price}')">
+                            <i class="fab fa-whatsapp"></i> Inquire
+                        </button>
+                        <button class="like-btn" onclick="toggleLike(this, '${product.name}', 'M${product.price}', '${product.id}')">
+                            <i class="far fa-heart"></i>
+                        </button>
+                    </div>
+                </div>
+            `;
+            
+            // Add admin controls to EVERY product when logged in
+            if (document.getElementById('adminContent') && document.getElementById('adminContent').style.display === 'block') {
+                const controls = document.createElement('div');
+                controls.className = 'product-admin-controls';
+                controls.innerHTML = `
+                    <button class="admin-control-btn edit" onclick="editProduct('${product.id}')"><i class="fas fa-edit"></i> Edit</button>
+                    <button class="admin-control-btn special" onclick="toggleSpecial('${product.id}')"><i class="fas fa-star"></i> Special</button>
+                    <button class="admin-control-btn delete" onclick="deleteProduct('${product.id}')"><i class="fas fa-trash"></i> Delete</button>
+                `;
+                card.appendChild(controls);
+            }
+            return card;
+        }
+        
+        // Slideshow
+        function initSlideshow() {
+            const slideshow = document.getElementById('heroSlideshow');
+            const controls = document.getElementById('slideControls');
+            if (!slideshow) return;
+            
+            // Clear existing slides but keep nav buttons
+            const navButtons = slideshow.querySelectorAll('.slide-nav-btn');
+            slideshow.innerHTML = '';
+            navButtons.forEach(btn => slideshow.appendChild(btn));
+            
+            controls.innerHTML = '';
+            
+            const allDisplayProducts = [...allProducts, ...addedProducts];
+            
+            allDisplayProducts.forEach((product, index) => {
+                const slide = document.createElement('div');
+                slide.className = `hero-slide ${index === 0 ? 'active' : ''}`;
+                slide.innerHTML = `
+                    <div class="slide-content">
+                        <div class="slide-image">
+                            <img src="${product.image}" alt="${product.name}">
+                        </div>
+                        <div class="slide-text">
+                            <h2>${product.name}</h2>
+                            <p>Handcrafted in Lesotho</p>
+                            <div class="slide-price">M${product.price}</div>
+                            ${product.special ? '<div class="special-badge-slide"><i class="fas fa-star"></i> SPECIAL</div>' : ''}
+                        </div>
+                    </div>
+                `;
+                slideshow.appendChild(slide);
+                
+                const dot = document.createElement('span');
+                dot.className = `slide-dot ${index === 0 ? 'active' : ''}`;
+                dot.onclick = () => goToSlide(index);
+                controls.appendChild(dot);
+            });
+            
+            startSlideshow();
+        }
+        
+        function goToSlide(index) {
+            const slides = document.querySelectorAll('.hero-slide');
+            const dots = document.querySelectorAll('.slide-dot');
+            if (!slides.length) return;
+            
+            if (index >= slides.length) index = 0;
+            if (index < 0) index = slides.length - 1;
+            
+            slides.forEach(s => s.classList.remove('active'));
+            dots.forEach(d => d.classList.remove('active'));
+            
+            slides[index].classList.add('active');
+            dots[index].classList.add('active');
+            currentSlide = index;
+        }
+        
+        function nextSlide() { if (!isPaused) goToSlide(currentSlide + 1); }
+        function prevSlide() { goToSlide(currentSlide - 1); }
+        
+        function startSlideshow() {
+            if (slideInterval) clearInterval(slideInterval);
+            slideInterval = setInterval(nextSlide, 5000);
+        }
+        
+        function pauseSlideshow() { isPaused = true; }
+        function resumeSlideshow() { isPaused = false; }
+        
+        // Google Maps
+        window.initMap = function() {
+            const location = { lat: -29.315, lng: 27.486 };
+            map = new google.maps.Map(document.getElementById('map'), {
+                center: location,
+                zoom: 14,
+                styles: [{ featureType: 'poi', stylers: [{ visibility: 'off' }] }]
+            });
+            new google.maps.Marker({
+                position: location,
+                map: map,
+                title: 'Nau Nau Carpentry'
+            });
+        };
+        
+        // Logo triple tap
+        window.handleLogoClick = function() {
+            tapCount++;
+            if (tapCount === 3) {
+                openAdminModal();
+                tapCount = 0;
+                clearTimeout(tapTimer);
+            }
+            clearTimeout(tapTimer);
+            tapTimer = setTimeout(() => tapCount = 0, 1000);
+        };
+        
+        // Dark mode
+        window.toggleDarkMode = function() {
+            document.body.classList.toggle('dark-mode');
+            const btn = document.querySelector('.dark-mode-toggle');
+            btn.innerHTML = document.body.classList.contains('dark-mode') ?
+                '<i class="fas fa-sun"></i> Light' : '<i class="fas fa-moon"></i> Dark';
+        };
+        
+        // Liked products
+        window.toggleLike = function(btn, name, price, id) {
+            const index = likedProducts.findIndex(p => p.id === id);
+            if (index === -1) {
+                likedProducts.push({ id, name, price });
+                showToast('❤️ Product added to favorites!', 'success');
+            } else {
+                likedProducts.splice(index, 1);
+                showToast('💔 Product removed from favorites', 'info');
+            }
+            updateLikedUI();
+        };
+        
+        function updateLikedUI() {
+            const countEl = document.getElementById('likedCount');
+            if (countEl) countEl.textContent = likedProducts.length;
+            
+            const bar = document.getElementById('floatingBar');
+            if (bar) bar.classList.toggle('show', likedProducts.length > 0);
+            
+            const tagsContainer = document.getElementById('selectedTags');
+            if (tagsContainer) {
+                tagsContainer.innerHTML = '';
+                likedProducts.forEach((p, i) => {
+                    const tag = document.createElement('div');
+                    tag.className = 'product-tag';
+                    tag.innerHTML = `
+                        <i class="fas fa-heart"></i>
+                        <span>${p.name}</span>
+                        <button onclick="removeLiked(${i})" style="background:none; border:none;">✕</button>
+                    `;
+                    tagsContainer.appendChild(tag);
+                });
+            }
+            
+            document.querySelectorAll('.like-btn').forEach(btn => {
+                const card = btn.closest('.product-card');
+                if (card) {
+                    const id = card.dataset.productId;
+                    if (likedProducts.some(p => p.id === id)) {
+                        btn.classList.add('liked');
+                        btn.innerHTML = '<i class="fas fa-heart"></i>';
+                    } else {
+                        btn.classList.remove('liked');
+                        btn.innerHTML = '<i class="far fa-heart"></i>';
+                    }
+                }
+            });
+            
+            localStorage.setItem('nauNauLiked', JSON.stringify(likedProducts));
+        }
+        
+        window.removeLiked = function(index) {
+            likedProducts.splice(index, 1);
+            showToast('💔 Product removed from favorites', 'info');
+            updateLikedUI();
+        };
+        
+        window.addLikedToMessage = function() {
+            if (likedProducts.length === 0) {
+                showToast('Please select some products first!', 'warning');
+                return;
+            }
+            const msg = document.getElementById('message');
+            const productText = likedProducts.map(p => `• ${p.name} - ${p.price}`).join('\n');
+            msg.value = msg.value.trim() ? msg.value + '\n\nI like:\n' + productText : 'I like:\n' + productText;
+            showToast('✅ Products added to message!', 'success');
+        };
+        
+        // Send to WhatsApp
+        window.inquireProduct = function(name, price) {
+            const phone = '26656551932';
+            const message = `Hello, I'm interested in ${name} (${price})`;
+            window.open(`https://wa.me/${phone}?text=${encodeURIComponent(message)}`, '_blank');
+            showToast('📱 Opening WhatsApp...', 'info');
+        };
+        
+        window.sendToWhatsApp = function() {
+            const msg = document.getElementById('message').value.trim();
+            
+            let finalMsg = msg;
+            
+            // Bundle liked products with message
+            if (likedProducts.length > 0) {
+                const products = likedProducts.map(p => `• ${p.name} - ${p.price}`).join('\n');
+                finalMsg = msg ? msg + '\n\nSelected items:\n' + products : 'Selected items:\n' + products;
+            }
+            
+            if (!finalMsg) {
+                showToast('Please type a message or select products!', 'warning');
+                return;
+            }
+            window.open(`https://wa.me/26656551932?text=${encodeURIComponent(finalMsg)}`, '_blank');
+            showToast('📱 Message sent to WhatsApp!', 'success');
+        };
+        
+        window.openWhatsApp = function() {
+            window.open('https://wa.me/26656551932', '_blank');
+            showToast('📱 Opening WhatsApp...', 'info');
+        };
+        
+        // Image upload
+        window.previewImage = function(input) {
+            const preview = document.getElementById('imagePreview');
+            if (input.files && input.files[0]) {
+                const reader = new FileReader();
+                reader.onload = e => {
+                    preview.src = e.target.result;
+                    preview.style.display = 'block';
+                    showToast('📸 Image ready to send!', 'success');
+                };
+                reader.readAsDataURL(input.files[0]);
+            }
+        };
+        
+        window.sendImageToWhatsApp = function() {
+            const preview = document.getElementById('imagePreview');
+            if (!preview.src || preview.style.display === 'none') {
+                showToast('Please select an image first!', 'warning');
+                return;
+            }
+            const msg = document.getElementById('message').value.trim() || "I'd like something like this:";
+            window.open(`https://wa.me/26656551932?text=${encodeURIComponent(msg)}`, '_blank');
+            showToast('📸 Image message sent!', 'success');
+        };
+        
+        // Search
+        window.searchProducts = function() {
+            const query = document.getElementById('searchInput').value.toLowerCase().trim();
+            document.querySelectorAll('.product-card').forEach(card => {
+                const title = card.querySelector('.product-title').textContent.toLowerCase();
+                card.style.display = title.includes(query) || query === '' ? 'block' : 'none';
+            });
+        };
+        
+        // Filter category
+        window.filterCategory = function(cat) {
+            document.querySelectorAll('.category-nav a').forEach(l => l.classList.remove('active'));
+            document.getElementById(`cat-${cat}`)?.classList.add('active');
+            
+            document.querySelectorAll('.product-card').forEach(card => {
+                card.style.display = cat === 'all' || card.dataset.category === cat ? 'block' : 'none';
+            });
+            showToast(`📋 Showing ${cat.toUpperCase()} category`, 'info');
+        };
+        
+        // Payment
+        window.togglePaymentPanel = function() {
+            document.getElementById('paymentPanel').classList.toggle('show');
+            document.getElementById('paymentMiniBtn').classList.toggle('active');
+        };
+        
+        window.showPayment = function(method) {
+            document.getElementById('mpesaDetails').classList.remove('show');
+            document.getElementById('ecocashDetails').classList.remove('show');
+            document.getElementById(method === 'mpesa' ? 'mpesaDetails' : 'ecocashDetails').classList.add('show');
+        };
+        
+        window.copyNumber = function(num) {
+            navigator.clipboard.writeText(num).then(() => {
+                showToast('📋 Number copied to clipboard!', 'success');
+            });
+        };
+        
+        // Admin
+        window.openAdminModal = function() {
+            document.getElementById('adminModal').classList.add('show');
+            document.getElementById('passwordSection').style.display = 'block';
+            document.getElementById('adminContent').style.display = 'none';
+        };
+        
+        window.closeAdminModal = function() {
+            document.getElementById('adminModal').classList.remove('show');
+        };
+        
+        window.logoutAdmin = function() {
+            document.getElementById('adminContent').style.display = 'none';
+            document.getElementById('passwordSection').style.display = 'block';
+            showToast('👋 Logged out successfully', 'info');
+            location.reload();
+        };
+        
+        // Show dashboard section
+        window.showDashboardSection = function(section) {
+            document.querySelectorAll('.dashboard-nav-btn').forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+            
+            document.querySelectorAll('.dashboard-section').forEach(s => s.classList.remove('active'));
+            document.getElementById(`dashboard-${section}`).classList.add('active');
+        };
+        
+        window.verifyPassword = function() {
+            if (document.getElementById('adminPassword').value === 'Boitu0011#@*') {
+                document.getElementById('passwordSection').style.display = 'none';
+                document.getElementById('adminContent').style.display = 'block';
+                updateDateTime();
+                setInterval(updateDateTime, 1000);
+                renderAdminProductList();
+                renderProducts(); // This will now show admin controls on ALL products
+                initSlideshow();
+                showToast('🔓 Welcome back, Admin!', 'success');
+            } else {
+                showToast('❌ Incorrect password!', 'error');
+            }
+        };
+        
+        // Product management with toast notifications
+        window.addNewProduct = function() {
+            const name = document.getElementById('newName').value.trim();
+            const price = document.getElementById('newPrice').value.trim();
+            const desc = document.getElementById('newDesc').value.trim();
+            const category = document.getElementById('newCategory').value;
+            const file = document.getElementById('newImage').files[0];
+            
+            if (!name || !price || !category || !file) {
+                showToast('⚠️ Please fill all fields and upload a photo!', 'warning');
+                return;
+            }
+            
+            const reader = new FileReader();
+            reader.onload = e => {
+                const newProduct = {
+                    id: 'custom_' + Date.now(),
+                    name, price, desc: desc || 'Handcrafted furniture',
+                    category, special: false,
+                    image: e.target.result
+                };
+                addedProducts.push(newProduct);
+                saveAddedProducts();
+                renderProducts();
+                initSlideshow();
+                renderAdminProductList();
+                
+                document.getElementById('newName').value = '';
+                document.getElementById('newPrice').value = '';
+                document.getElementById('newDesc').value = '';
+                document.getElementById('newImage').value = '';
+                document.getElementById('imagePreview').innerHTML = '';
+                
+                showToast('✅ Product added successfully!', 'success');
+            };
+            reader.readAsDataURL(file);
+        };
+        
+        window.editProduct = function(id) {
+            let product = allProducts.find(p => p.id === id) || addedProducts.find(p => p.id === id);
+            if (!product) return;
+            
+            const newName = prompt('Enter new name:', product.name);
+            if (newName) product.name = newName;
+            
+            const newPrice = prompt('Enter new price:', product.price);
+            if (newPrice) product.price = newPrice;
+            
+            if (id.toString().startsWith('custom_')) {
+                saveAddedProducts();
+            } else {
+                saveAllProducts();
+            }
+            renderProducts();
+            initSlideshow();
+            renderAdminProductList();
+            showToast('✏️ Product updated successfully!', 'success');
+        };
+        
+        window.toggleSpecial = function(id) {
+            let product = allProducts.find(p => p.id === id) || addedProducts.find(p => p.id === id);
+            if (product) {
+                product.special = !product.special;
+                if (id.toString().startsWith('custom_')) {
+                    saveAddedProducts();
+                } else {
+                    saveAllProducts();
+                }
+                renderProducts();
+                initSlideshow();
+                renderAdminProductList();
+                showToast(product.special ? '⭐ Special tag added!' : '🌟 Special tag removed', 'success');
+            }
+        };
+        
+        window.deleteProduct = function(id) {
+            if (!confirm('Are you sure you want to delete this product?')) return;
+            
+            // Check if it's a custom product or base product
+            const customIndex = addedProducts.findIndex(p => p.id === id);
+            if (customIndex !== -1) {
+                addedProducts.splice(customIndex, 1);
+                saveAddedProducts();
+                showToast('🗑️ Custom product deleted!', 'success');
+            } else {
+                // Base product - find and remove from allProducts array
+                const baseIndex = allProducts.findIndex(p => p.id === id);
+                if (baseIndex !== -1) {
+                    allProducts.splice(baseIndex, 1);
+                    saveAllProducts();
+                    showToast('🗑️ Product deleted!', 'success');
+                }
+            }
+            renderProducts();
+            initSlideshow();
+            renderAdminProductList();
+        };
+        
+        function renderAdminProductList() {
+            const list = document.getElementById('adminProductList');
+            if (!list) return;
+            list.innerHTML = '';
+            
+            [...allProducts, ...addedProducts].forEach(p => {
+                const div = document.createElement('div');
+                div.style = 'display:flex; gap:0.8rem; align-items:center; margin-bottom:0.8rem; padding:0.8rem; background:var(--bg-primary); border-radius:12px; flex-wrap:wrap;';
+                div.innerHTML = `
+                    <img src="${p.image}" style="width:40px; height:40px; border-radius:6px;">
+                    <div style="flex:1;"><strong>${p.name}</strong><br><small>M${p.price}</small></div>
+                    <div style="display:flex; gap:0.3rem;">
+                        <button onclick="editProduct('${p.id}')" style="background:var(--accent-brown); color:white; border:none; padding:0.3rem 0.6rem; border-radius:20px;">Edit</button>
+                        <button onclick="toggleSpecial('${p.id}')" style="background:var(--special-color); color:white; border:none; padding:0.3rem 0.6rem; border-radius:20px;">Special</button>
+                        <button onclick="deleteProduct('${p.id}')" style="background:var(--danger-color); color:white; border:none; padding:0.3rem 0.6rem; border-radius:20px;">Delete</button>
+                    </div>
+                `;
+                list.appendChild(div);
+            });
+        }
+        
+        function updateProductSelect() {
+            const select = document.getElementById('productSelect');
+            if (!select) return;
+            select.innerHTML = '';
+            [...allProducts, ...addedProducts].forEach(p => {
+                const opt = document.createElement('option');
+                opt.value = `${p.name} - M${p.price}`;
+                opt.textContent = `${p.name} - M${p.price}`;
+                select.appendChild(opt);
+            });
+        }
+        
+        // Receipt functions
+        function updateDateTime() {
+            const now = new Date();
+            const dateStr = now.toLocaleDateString();
+            const timeStr = now.toLocaleTimeString();
+            
+            document.getElementById('receiptDate').textContent = dateStr;
+            document.getElementById('receiptTime').textContent = timeStr;
+        }
+        
+        function updateReceiptPreview() {
+            document.getElementById('receiptCustomer').textContent = document.getElementById('customerName').value || '-';
+            document.getElementById('receiptProduct').textContent = document.getElementById('productSelect').value;
+            document.getElementById('receiptAmount').textContent = document.getElementById('amountPaid').value ? `M${document.getElementById('amountPaid').value}` : '-';
+            document.getElementById('receiptPayment').textContent = document.getElementById('paymentMethod').value;
+        }
+        
+        // Download PDF and then send via WhatsApp
+        window.downloadAndSendPDF = function() {
+            const customer = document.getElementById('customerName').value || 'Customer';
+            if (!customer) {
+                showToast('⚠️ Please enter customer name!', 'warning');
+                return;
+            }
+            
+            showToast('📄 Generating PDF receipt...', 'info');
+            
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF({
+                orientation: 'portrait',
+                unit: 'mm',
+                format: 'a4'
+            });
+            
+            const product = document.getElementById('productSelect').value;
+            const amount = document.getElementById('amountPaid').value || '0';
+            const payment = document.getElementById('paymentMethod').value;
+            const date = new Date().toLocaleDateString();
+            const time = new Date().toLocaleTimeString();
+            
+            // Professional receipt design
+            doc.setFillColor(139, 90, 43);
+            doc.rect(0, 0, 210, 30, 'F');
+            
+            doc.setTextColor(255, 255, 255);
+            doc.setFontSize(24);
+            doc.setFont('helvetica', 'bold');
+            doc.text('Nau Nau Carpentry', 105, 18, { align: 'center' });
+            
+            doc.setTextColor(139, 90, 43);
+            doc.setFontSize(14);
+            doc.text('OFFICIAL RECEIPT', 105, 40, { align: 'center' });
+            
+            // Receipt details
+            doc.setDrawColor(139, 90, 43);
+            doc.setLineWidth(0.5);
+            doc.line(20, 45, 190, 45);
+            
+            doc.setTextColor(0, 0, 0);
+            doc.setFontSize(11);
+            doc.text(`Date: ${date}`, 20, 60);
+            doc.text(`Time: ${time}`, 20, 68);
+            doc.text(`Customer: ${customer}`, 20, 80);
+            doc.text(`Product: ${product}`, 20, 90);
+            doc.text(`Amount Paid: M${amount}`, 20, 100);
+            doc.text(`Payment Method: ${payment}`, 20, 110);
+            
+            // Wax seal design in PDF
+            doc.setFillColor(139, 0, 0);
+            doc.circle(150, 80, 25, 'F');
+            
+            doc.setTextColor(255, 215, 0);
+            doc.setFontSize(8);
+            doc.text('NAU NAU CARPENTRY', 150, 70, { align: 'center' });
+            
+            doc.setFontSize(16);
+            doc.text('PAID', 150, 82, { align: 'center' });
+            
+            doc.setFontSize(7);
+            doc.text('EST. 2010', 150, 95, { align: 'center' });
+            
+            // Footer
+            doc.setTextColor(100, 100, 100);
+            doc.setFontSize(9);
+            doc.text('Thank you for choosing Nau Nau Carpentry', 105, 280, { align: 'center' });
+            doc.text('Built to last interiors', 105, 285, { align: 'center' });
+            
+            // Save the PDF
+            const fileName = `NauNau_Receipt_${customer}.pdf`;
+            doc.save(fileName);
+            
+            showToast('📥 PDF downloaded!', 'success');
+            
+            // After saving, ask to send via WhatsApp
+            setTimeout(() => {
+                if (confirm('PDF downloaded! Send this receipt to the customer via WhatsApp?')) {
+                    const receiptMsg = `🪚 Nau Nau Carpentry - OFFICIAL RECEIPT\n════════════════════\nDate: ${date} ${time}\nCustomer: ${customer}\nProduct: ${product}\nAmount: M${amount}\nPayment: ${payment}\n════════════════════\n⭕ PAID ⭕\nNau Nau Carpentry\n════════════════════\n*A PDF receipt has been downloaded - please attach it to this message*`;
+                    
+                    window.open(`https://wa.me/26656551932?text=${encodeURIComponent(receiptMsg)}`, '_blank');
+                    showToast('📱 Opening WhatsApp...', 'info');
+                }
+            }, 1000);
+        };
+        
+        // Initialize
+        window.addEventListener('load', () => {
+            loadData();
+            renderProducts();
+            initSlideshow();
+            
+            const slideshow = document.getElementById('heroSlideshow');
+            if (slideshow) {
+                slideshow.addEventListener('mouseenter', pauseSlideshow);
+                slideshow.addEventListener('mouseleave', resumeSlideshow);
+                slideshow.addEventListener('touchstart', pauseSlideshow);
+                slideshow.addEventListener('touchend', resumeSlideshow);
+            }
+            
+            document.getElementById('mpesaDetails')?.classList.remove('show');
+            document.getElementById('ecocashDetails')?.classList.remove('show');
+            
+            filterCategory('all');
+            updateDateTime();
+            
+            ['customerName', 'productSelect', 'amountPaid', 'paymentMethod'].forEach(id => {
+                document.getElementById(id)?.addEventListener('input', updateReceiptPreview);
+            });
+            
+            showToast(' Welcome to Nau Nau Carpentry!', 'info');
+        });
+        
+        // Close on outside click
+        window.addEventListener('click', e => {
+            if (e.target.classList.contains('admin-modal')) closeAdminModal();
+            const panel = document.getElementById('paymentPanel');
+            const btn = document.getElementById('paymentMiniBtn');
+            if (panel && btn && !panel.contains(e.target) && !btn.contains(e.target) && panel.classList.contains('show')) {
+                panel.classList.remove('show');
+                btn.classList.remove('active');
+            }
+        });
+    </script>
+</body>
+</html>
